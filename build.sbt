@@ -6,7 +6,8 @@ scalaVersion := "2.12.6"
 
 scalacOptions := Seq(
   "-deprecation",
-  "-encoding", "UTF-8",
+  "-encoding",
+  "UTF-8",
   "-feature",
   "-language:existentials",
   "-language:higherKinds",
@@ -19,15 +20,18 @@ scalacOptions := Seq(
   "-Ywarn-numeric-widen",
   "-Ywarn-value-discard",
   "-Xfuture",
-  "-Ywarn-unused-import"
+  "-Ywarn-unused-import",
+  "-Ywarn-unused-import",
+  "-Ydelambdafy:inline",
+  "-Ypartial-unification"
 )
 
 libraryDependencies ++= {
-  val http4sVersion = "0.18.12"
-  val circeVersion = "0.9.2"
-  val log4CatsVersion = "0.0.6"
+  val http4sVersion = "0.18.17"
+  val circeVersion = "0.9.3"
+  val log4CatsVersion = "0.1.1"
   val pureconfigVersion = "0.9.2"
-  val typefageConfigVersion = "1.3.2"
+  val typefageConfigVersion = "1.3.3"
   val lobackVersion = "1.2.3"
 
   Seq(
