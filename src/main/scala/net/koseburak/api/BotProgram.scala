@@ -1,6 +1,5 @@
 package net.koseburak.api
 
-import cats.data.NonEmptyList
 import cats.effect._
 import cats.implicits._
 import io.chrisdavenport.log4cats.slf4j._
@@ -41,18 +40,19 @@ class StreamingBotProgram[F[_]](config: AppConfig)(implicit E: Effect[F], ec: Ex
       every(frequency.value.seconds)
         .evalMap(_ => checker.check)
         .evalMap {
-          case AppointmentResponse(slots) =>
-            for {
-              _ <- tracker.success
-              slotsPrettified = prettify(slots)
-              message = s"""
-                   |$slotsPrettified
-                   |Fast access: ${appointmentSystemUri.value}
+          case AppointmentResponse(slots) if slots.nonEmpty =>
+            tracker.success(slots).flatMap { isChanged =>
+              if (isChanged) {
+                val slotsPrettified = prettify(slots)
+                val message = s"""
+                             |$slotsPrettified
+                             |Fast access: ${appointmentSystemUri.value}
                  """.stripMargin
-              _ <- messenger.sendMessage(message)
-            } yield ()
-          case _: EmptyAppointmentResponse => tracker.empty
-          case other => tracker.error
+                messenger.sendMessage(message)
+              } else E.unit
+            }
+          case _: EmptyAppointmentResponse | AppointmentResponse(Nil) => tracker.empty
+          case _ => tracker.error
         }
     val reporterS: Stream[F, Unit] =
       every(reporterFrequency.value.seconds)
@@ -61,7 +61,7 @@ class StreamingBotProgram[F[_]](config: AppConfig)(implicit E: Effect[F], ec: Ex
     mainS.merge(reporterS)
   }
 
-  private def prettify(slots: NonEmptyList[Appointment]): String =
+  private def prettify(slots: List[Appointment]): String =
     slots.map(_.time).foldLeft("")((acc, time) => acc + time + "\n")
 
   private def every(d: FiniteDuration): Stream[F, Boolean] =
