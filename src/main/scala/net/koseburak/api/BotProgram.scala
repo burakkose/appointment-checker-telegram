@@ -58,7 +58,7 @@ class StreamingBotProgram[F[_]](config: AppConfig)(implicit E: Effect[F], ec: Ex
       every(reporterFrequency.value.seconds)
         .evalMap(_ => tracker.resetAndGetMessage)
         .evalMap(messenger.sendMessage)
-    Stream(mainS, reporterS).covary[F].join(2)
+    mainS.merge(reporterS)
   }
 
   private def prettify(slots: NonEmptyList[Appointment]): String =

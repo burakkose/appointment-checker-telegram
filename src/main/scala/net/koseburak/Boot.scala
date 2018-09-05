@@ -1,5 +1,7 @@
 package net.koseburak
 
+import java.util.concurrent.Executors
+
 import cats.effect.{Effect, IO}
 import com.typesafe.config.ConfigFactory
 import fs2.StreamApp
@@ -8,10 +10,11 @@ import net.koseburak.model.AppConfig
 import pureconfig.module.catseffect._
 import eu.timepit.refined.pureconfig._
 
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.ExecutionContext
 
 object Boot extends StreamApp[IO] {
   def stream(args: List[String], requestShutdown: IO[Unit]): fs2.Stream[IO, StreamApp.ExitCode] = {
+    implicit val ec = ExecutionContext.fromExecutor(Executors.newCachedThreadPool())
     val E = Effect[IO]
     val streamF = for {
       config <- E.delay(ConfigFactory.load())
