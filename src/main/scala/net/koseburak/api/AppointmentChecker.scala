@@ -28,7 +28,7 @@ class GnibAppointmentChecker[F[_]: Sync](
   private val base = Uri.uri("https://burghquayregistrationoffice.inis.gov.ie/Website/AMSREG/AMSRegWeb.nsf/(getAppsNear)")
   private val query = base.setQueryParams(
     Map(
-      "openpage" -> Seq(""),
+      "readform" -> Seq(""),
       "cat" -> Seq(category),
       "sbcat" -> Seq(subCategory),
       "typ" -> Seq(typ)

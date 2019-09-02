@@ -15,8 +15,8 @@ object AppointmentHttpResponse {
 
   implicit val decodeResponse: Decoder[AppointmentHttpResponse] =
     List[Decoder[AppointmentHttpResponse]](
-      Decoder[AppointmentResponse].widen,
       Decoder[EmptyAppointmentResponse].widen,
       Decoder[ErrorResponse].widen,
+      Decoder[AppointmentResponse].widen,
     ).reduceLeft(_ or _)
 }
